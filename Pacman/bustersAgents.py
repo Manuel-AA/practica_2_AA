@@ -18,7 +18,8 @@ from game import Directions
 from keyboardAgents import KeyboardAgent
 import inference
 import busters
-from learningAgents import ReinforcementAgent
+
+import random,util,math
 
 instancias = []
 lastMoves = []
@@ -560,7 +561,7 @@ class BasicAgentAA(BustersAgent):
         else:
             return ""
 
-class QLearningAgent(ReinforcementAgent):
+class QLearningAgent(BustersAgent):
     """
       Q-Learning Agent
 
@@ -574,9 +575,9 @@ class QLearningAgent(ReinforcementAgent):
     """
     def __init__(self, **args):
         "Initialize Q-values"
-        ReinforcementAgent.__init__(self, **args)
+        BustersAgent.__init__(self, **args)
 
-        self.actions = {"north":0, "east":1, "south":2, "west":3, "exit":4}
+        self.actions = {"North":0, "East":1, "South":2, "West":3, "Stop":4}
         self.table_file = open("qtable.txt", "r+")
         self.q_table = self.readQtable()
 	self.epsilon = 0.05
@@ -613,7 +614,7 @@ class QLearningAgent(ReinforcementAgent):
 	Compute the row of the qtable for a given state.
 	For instance, the state (3,1) is the row 7
 	"""
-        return state[0]+state[1]*4
+        return 0
 
     def getQValue(self, state, action):
 
@@ -646,7 +647,7 @@ class QLearningAgent(ReinforcementAgent):
           are no legal actions, which is the case at the terminal state,
           you should return None.
         """
-        legalActions = self.getLegalActions(state)
+        legalActions = state.getLegalActions()
         if len(legalActions)==0:
           return None
 
@@ -672,7 +673,7 @@ class QLearningAgent(ReinforcementAgent):
         """
 
         # Pick Action
-        legalActions = self.getLegalActions(state)
+        legalActions = state.getLegalActions()
         action = None
 
         if len(legalActions) == 0:
@@ -718,6 +719,7 @@ class QLearningAgent(ReinforcementAgent):
     def getValue(self, state):
 	"Return the highest q value for a given state"
         return self.computeValueFromQValues(state)
+
     
 
         
