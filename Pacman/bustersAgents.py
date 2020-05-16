@@ -580,7 +580,9 @@ class QLearningAgent(BustersAgent):
         self.actions = {"North":0, "East":1, "South":2, "West":3, "Stop":4}
         self.table_file = open("qtable.txt", "r+")
         self.q_table = self.readQtable()
-	self.epsilon = 0.05
+        self.epsilon = 0.05
+        self.alpha = 0.5
+        self.discount = 0.5
 
     def readQtable(self):
 	"Read qtable from disc"
@@ -614,7 +616,45 @@ class QLearningAgent(BustersAgent):
 	Compute the row of the qtable for a given state.
 	For instance, the state (3,1) is the row 7
 	"""
-        return 0
+        estado = []
+        posicionPacman = state.getPacmanPosition()
+        posicionFantasmas = state.getGhostPositions()
+        distanciaFantasmas = state.data.ghostDistances
+        disMin = 1000
+        for i in range(len(distanciaFantasmas)):
+            if distanciaFantasmas[i] < disMin and distanciaFantasmas[i] != None: disMin = distanciaFantasmas[i]
+        indiceMin = distanciaFantasmas.index(disMin)
+        fantasmaCercano = posicionFantasmas[indiceMin]
+        if (disMin <= 5):
+            disMin = 0
+
+        if (disMin > 5 and disMin <= 10):
+            disMin = 1
+
+        if (disMin > 10):
+            disMin = 2
+
+        estado.append(disMin)
+        restaX = fantasmaCercano[0]-posicionPacman[0]
+        restaY = fantasmaCercano[1]-posicionPacman[1]
+
+        #Arriba y derecha arriba
+        if (((restaX > 0) and (restaY > 0)) or ((restaX == 0) and (restaY > 0))):
+            estado.append(0)
+        
+        #Derecha y derecha abajo
+        if (((restaX > 0) and (restaY < 0)) or ((restaX > 0) and (restaY == 0))):
+            estado.append(1)
+        
+        #Abajo e izquierda abajo
+        if (((restaX < 0) and (restaY < 0)) or ((restaX == 0) and (restaY < 0))):
+            estado.append(2)
+        
+        #Izquierda e izquierda arriba
+        if (((restaX < 0) and (restaY > 0)) or ((restaX < 0) and (restaY == 0))):
+            estado.append(3)
+
+        return estado[0]*4+estado[1]
 
     def getQValue(self, state, action):
 
@@ -624,7 +664,9 @@ class QLearningAgent(BustersAgent):
           or the Q node value otherwise
         """
         position = self.computePosition(state)
+        print(position)
         action_column = self.actions[action]
+        print(action_column)
 
         return self.q_table[position][action_column]
 
@@ -705,6 +747,7 @@ class QLearningAgent(BustersAgent):
 		
         """
         "*** YOUR CODE HERE ***"
+        print("Reward: ")
         position = self.computePosition(state)
         action_column = self.actions[action]
         if reward != 0:

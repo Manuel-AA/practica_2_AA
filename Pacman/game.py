@@ -685,12 +685,14 @@ class Game:
             else:
                 action = agent.getAction(observation)
             self.unmute()
-
+            
+            estado_actual = self.state
             # Execute the action
             self.moveHistory.append( (agentIndex, action) )
             if self.catchExceptions:
                 try:
                     self.state = self.state.generateSuccessor( agentIndex, action )
+                    estado_siguiente = self.state
                 except Exception,data:
                     self.mute(agentIndex)
                     self._agentCrash(agentIndex)
@@ -698,6 +700,9 @@ class Game:
                     return
             else:
                 self.state = self.state.generateSuccessor( agentIndex, action )
+            estado_siguiente = self.state
+            if agentIndex == 0 and (str(agent).find("QLearningAgent")!= -1):
+                agent.update(estado_actual, action, estado_siguiente, 10)
             if agentIndex == 0 and (str(agent).find("BustersKeyboardAgent") != -1 or str(agent).find("BasicAgentAA") != -1):
                 fichero = open("prueba.arff","a")
                 if os.stat("prueba.arff").st_size == 0:
@@ -713,7 +718,9 @@ class Game:
                     fichero.write(agent.printLineData(observation))
                 fichero.close()
             # Change the display
+            print("ANTES\n")
             self.display.update( self.state.data )
+            print("DESPUES\n")
             ###idx = agentIndex - agentIndex % 2 + 1
             ###self.display.update( self.state.makeObservation(idx).data )
 
