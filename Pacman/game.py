@@ -702,7 +702,19 @@ class Game:
                 self.state = self.state.generateSuccessor( agentIndex, action )
             estado_siguiente = self.state
             if agentIndex == 0 and (str(agent).find("QLearningAgent")!= -1):
-                agent.update(estado_actual, action, estado_siguiente, 10)
+                reward = 0
+                '''distanciaComida = self.state.getDistanceNearestFood()
+                if (distanciaComida == 0):
+                    reward = reward + 100
+                
+                distanciaFantasmas = self.state.data.ghostDistances
+                print(distanciaFantasmas)
+                print(reward)'''
+                if estado_actual.getScore() < estado_siguiente.getScore():
+                    reward = estado_siguiente.getScore() - estado_actual.getScore() 
+                else:
+                    reward = -1
+                agent.update(estado_actual, action, estado_siguiente, reward)
             if agentIndex == 0 and (str(agent).find("BustersKeyboardAgent") != -1 or str(agent).find("BasicAgentAA") != -1):
                 fichero = open("prueba.arff","a")
                 if os.stat("prueba.arff").st_size == 0:

@@ -580,7 +580,7 @@ class QLearningAgent(BustersAgent):
         self.actions = {"North":0, "East":1, "South":2, "West":3, "Stop":4}
         self.table_file = open("qtable.txt", "r+")
         self.q_table = self.readQtable()
-        self.epsilon = 0.05
+        self.epsilon = 0.7
         self.alpha = 0.5
         self.discount = 0.5
 
@@ -617,6 +617,11 @@ class QLearningAgent(BustersAgent):
 	For instance, the state (3,1) is the row 7
 	"""
         estado = []
+        acciones_legales = state.getLegalActions()
+        muroNorte = 0
+        muroEste = 0
+        muroSur = 0
+        muroOeste = 0
         posicionPacman = state.getPacmanPosition()
         posicionFantasmas = state.getGhostPositions()
         distanciaFantasmas = state.data.ghostDistances
@@ -654,7 +659,24 @@ class QLearningAgent(BustersAgent):
         if (((restaX < 0) and (restaY > 0)) or ((restaX < 0) and (restaY == 0))):
             estado.append(3)
 
-        return estado[0]*4+estado[1]
+        if "North" not in acciones_legales:
+            muroNorte = 1
+        
+        if "East" not in acciones_legales:
+            muroEste = 1
+        
+        if "South" not in acciones_legales:
+            muroSur = 1
+        
+        if "West" not in acciones_legales:
+            muroOeste = 1
+        
+        estado.append(muroNorte)
+        estado.append(muroEste)
+        estado.append(muroSur)
+        estado.append(muroOeste)
+
+        return estado[0]*64+estado[1]*16+estado[2]*8+estado[3]*4+estado[4]*2+estado[5]
 
     def getQValue(self, state, action):
 
@@ -678,7 +700,7 @@ class QLearningAgent(BustersAgent):
           there are no legal actions, which is the case at the
           terminal state, you should return a value of 0.0.
         """
-     	legalActions = self.getLegalActions(state)
+     	legalActions = state.getLegalActions()
         if len(legalActions)==0:
           return 0
         return max(self.q_table[self.computePosition(state)])
@@ -747,10 +769,16 @@ class QLearningAgent(BustersAgent):
 		
         """
         "*** YOUR CODE HERE ***"
-        print("Reward: ")
+        print("Reward: "+str(reward)+"\n")
+        es_terminal = True
+        fantasmasVivos = state.getLivingGhosts()
+        for i in range(len(fantasmasVivos)):
+            if fantasmasVivos[i] == True:
+                es_terminal = False
+        print(fantasmasVivos)
         position = self.computePosition(state)
         action_column = self.actions[action]
-        if reward != 0:
+        if es_terminal:
             self.q_table[position][action_column] = (1-self.alpha)*self.q_table[position][action_column] + self.alpha * reward
         else:
             self.q_table[position][action_column] = (1-self.alpha)*self.q_table[position][action_column] + self.alpha * (reward + self.discount * self.computeValueFromQValues(nextState))
