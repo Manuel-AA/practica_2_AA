@@ -580,9 +580,9 @@ class QLearningAgent(BustersAgent):
         self.actions = {"North":0, "East":1, "South":2, "West":3, "Stop":4}
         self.table_file = open("qtable.txt", "r+")
         self.q_table = self.readQtable()
-        self.epsilon = 0.5
-        self.alpha = 0.1
-        self.discount = 0.9
+        self.epsilon = 0.8
+        self.alpha = 0.5
+        self.discount = 0.5
 
     def readQtable(self):
 	"Read qtable from disc"
@@ -622,6 +622,7 @@ class QLearningAgent(BustersAgent):
         muroEste = 0
         muroSur = 0
         muroOeste = 0
+        comidaCercana = state.getDistanceNearestFood()
         posicionPacman = state.getPacmanPosition()
         posicionFantasmas = state.getGhostPositions()
         distanciaFantasmas = state.data.ghostDistances
@@ -659,7 +660,17 @@ class QLearningAgent(BustersAgent):
         if (((restaX < 0) and (restaY > 0)) or ((restaX == 0) and (restaY > 0))):
             estado.append(3)
 
-        print(acciones_legales)
+        if (comidaCercana <= 5):
+            comidaCercana = 0
+        
+        if (comidaCercana > 5):
+            comidaCercana = 1
+        
+        if (comidaCercana == None):
+            comidaCercana = 2
+        
+        estado.append(comidaCercana)
+        '''print(acciones_legales)
 
         if "North" not in acciones_legales:
             muroNorte = 1
@@ -674,12 +685,12 @@ class QLearningAgent(BustersAgent):
             muroOeste = 1
 
         print(muroNorte, muroEste, muroSur, muroOeste)
-        '''estado.append(muroNorte)
+        estado.append(muroNorte)
         estado.append(muroEste)
         estado.append(muroSur)
         estado.append(muroOeste)'''
 
-        return estado[0]*4+estado[1]
+        return estado[0]*12+estado[1]*3+estado[2]
 
     def getQValue(self, state, action):
 
