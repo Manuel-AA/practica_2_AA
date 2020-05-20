@@ -712,8 +712,7 @@ class Game:
                 print(reward)'''
                 if estado_actual.getScore() < estado_siguiente.getScore():
                     reward = estado_siguiente.getScore() - estado_actual.getScore() 
-                else:
-                    reward = -1
+            
                 agent.update(estado_actual, action, estado_siguiente, reward)
             if agentIndex == 0 and (str(agent).find("BustersKeyboardAgent") != -1 or str(agent).find("BasicAgentAA") != -1):
                 fichero = open("prueba.arff","a")

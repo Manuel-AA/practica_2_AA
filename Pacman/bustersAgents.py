@@ -580,9 +580,9 @@ class QLearningAgent(BustersAgent):
         self.actions = {"North":0, "East":1, "South":2, "West":3, "Stop":4}
         self.table_file = open("qtable.txt", "r+")
         self.q_table = self.readQtable()
-        self.epsilon = 0.7
-        self.alpha = 0.5
-        self.discount = 0.5
+        self.epsilon = 0.5
+        self.alpha = 0.1
+        self.discount = 0.9
 
     def readQtable(self):
 	"Read qtable from disc"
@@ -643,21 +643,23 @@ class QLearningAgent(BustersAgent):
         restaX = fantasmaCercano[0]-posicionPacman[0]
         restaY = fantasmaCercano[1]-posicionPacman[1]
 
-        #Arriba y derecha arriba
-        if (((restaX > 0) and (restaY > 0)) or ((restaX == 0) and (restaY > 0))):
+        #Derecha y derecha arriba
+        if (((restaX > 0) and (restaY > 0)) or ((restaX > 0) and (restaY == 0))):
             estado.append(0)
         
-        #Derecha y derecha abajo
-        if (((restaX > 0) and (restaY < 0)) or ((restaX > 0) and (restaY == 0))):
+        #Abajo y derecha abajo
+        if (((restaX > 0) and (restaY < 0)) or ((restaX == 0) and (restaY < 0))):
             estado.append(1)
         
-        #Abajo e izquierda abajo
-        if (((restaX < 0) and (restaY < 0)) or ((restaX == 0) and (restaY < 0))):
+        #Izquierda e izquierda abajo
+        if (((restaX < 0) and (restaY < 0)) or ((restaX < 0) and (restaY == 0))):
             estado.append(2)
         
-        #Izquierda e izquierda arriba
-        if (((restaX < 0) and (restaY > 0)) or ((restaX < 0) and (restaY == 0))):
+        #Arriba e izquierda arriba
+        if (((restaX < 0) and (restaY > 0)) or ((restaX == 0) and (restaY > 0))):
             estado.append(3)
+
+        print(acciones_legales)
 
         if "North" not in acciones_legales:
             muroNorte = 1
@@ -670,13 +672,14 @@ class QLearningAgent(BustersAgent):
         
         if "West" not in acciones_legales:
             muroOeste = 1
-        
-        estado.append(muroNorte)
+
+        print(muroNorte, muroEste, muroSur, muroOeste)
+        '''estado.append(muroNorte)
         estado.append(muroEste)
         estado.append(muroSur)
-        estado.append(muroOeste)
+        estado.append(muroOeste)'''
 
-        return estado[0]*64+estado[1]*16+estado[2]*8+estado[3]*4+estado[4]*2+estado[5]
+        return estado[0]*4+estado[1]
 
     def getQValue(self, state, action):
 
